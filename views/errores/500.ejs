@@ -1,0 +1,43 @@
+<%
+  const haySesion = typeof usuario !== "undefined" && usuario;
+%>
+<% if (haySesion) { %>
+<%- include('../plantillas/header', { seccion: '', titulo: 'Algo salió mal' }) %>
+<% } else { %>
+<%- include('../plantillas/auth_header') %>
+<% } %>
+
+<% if (haySesion) { %>
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">Error 500</p>
+    <h1>Algo salió mal</h1>
+    <p class="subtitle">Ocurrió un error inesperado. Intenta de nuevo en un momento.</p>
+  </div>
+</div>
+
+<div class="card">
+  <div class="empty-state">
+    <i class="bi bi-exclamation-octagon"></i>
+    <p>El problema quedó registrado para revisión.</p>
+    <a href="/reportes/diario" class="primary-button">
+      <i class="bi bi-arrow-left"></i>Volver al inicio
+    </a>
+  </div>
+</div>
+<% } else { %>
+<div class="auth-head">
+  <div class="auth-logo"><i class="bi bi-exclamation-octagon"></i></div>
+  <h1>Algo salió mal</h1>
+  <p>Ocurrió un error inesperado. Intenta de nuevo en un momento.</p>
+</div>
+<a class="primary-button" href="/login">
+  <i class="bi bi-arrow-left"></i>Volver al inicio
+</a>
+<% } %>
+
+<% if (haySesion) { %>
+<%- include('../plantillas/footer') %>
+<% } else { %>
+<%- include('../plantillas/auth_footer') %>
+<% } %>

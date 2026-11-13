@@ -1,0 +1,67 @@
+<%- include('../plantillas/header', { seccion: 'compradores', titulo: 'Compradores' }) %>
+
+<%
+  const listaCompradores =
+    typeof compradores !== "undefined" && compradores ? compradores : [];
+%>
+
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">Perfiles de compra</p>
+    <h1>Compradores</h1>
+    <p class="subtitle">Datos de compra de las cuentas con rol comprador.</p>
+  </div>
+</div>
+
+<div class="card">
+  <div class="toolbar">
+    <div>
+      <strong>Perfiles de compradores</strong>
+      <p><%= listaCompradores.length %> <%= listaCompradores.length === 1 ? 'comprador registrado' : 'compradores registrados' %></p>
+    </div>
+  </div>
+
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>N.º</th>
+          <th>Comprador</th>
+          <th>Correo</th>
+          <th class="cell-center">Compras</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (listaCompradores.length) { %>
+          <% listaCompradores.forEach((c) => { %>
+          <tr>
+            <td class="row-id">#<%= c.codigo_cpr %></td>
+            <td>
+              <div class="cell-main">
+                <span class="cell-avatar"><%= (c.nombre || '?').charAt(0).toUpperCase() %></span>
+                <div>
+                  <div class="cell-name"><%= c.nombre %> <%= c.apellido_paterno %></div>
+                  <div class="cell-meta"><%= c.apellido_materno %></div>
+                </div>
+              </div>
+            </td>
+            <td class="cell-muted"><%= c.correo %></td>
+            <td class="cell-center"><%= c.compras ? c.compras.length : 0 %></td>
+          </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="4">
+              <div class="empty-state">
+                <i class="bi bi-person-vcard"></i>
+                <p>Todavía no hay compradores registrados.</p>
+              </div>
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('../plantillas/footer') %>

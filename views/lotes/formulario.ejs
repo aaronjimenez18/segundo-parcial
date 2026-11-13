@@ -1,0 +1,115 @@
+<%- include('../plantillas/header', { seccion: 'lotes', titulo: lote ? 'Editar entrada' : 'Nueva entrada' }) %>
+
+<%
+  const listaTipos = typeof tipos !== "undefined" && tipos ? tipos : [];
+  const igual = (a, b) => String(a) === String(b);
+  const filasFormulario =
+    typeof especiesLote !== "undefined" &&
+    Array.isArray(especiesLote) &&
+    especiesLote.length
+      ? especiesLote
+      : [{}];
+  const fechaValor = (d) => {
+    if (!d) return "";
+    const f = new Date(d);
+    if (isNaN(f.getTime())) return "";
+    const p = (n) => String(n).padStart(2, "0");
+    return `${f.getFullYear()}-${p(f.getMonth() + 1)}-${p(f.getDate())}T${p(f.getHours())}:${p(f.getMinutes())}`;
+  };
+%>
+
+<div class="form-wrap">
+  <a class="breadcrumb-back" href="/lotes">
+    <i class="bi bi-arrow-left"></i>Volver a mercancía
+  </a>
+
+  <div class="card form-card">
+    <div class="card-head">
+      <div>
+        <p class="eyebrow">Lo que llega</p>
+        <h2><%= lote ? 'Editar lote' : 'Nuevo lote' %></h2>
+        <p>Anota qué productos llegaron, sus kilos, cajas y precio de venta.</p>
+      </div>
+    </div>
+
+    <% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert-danger" role="alert">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <div><%= error %></div>
+    </div>
+    <% } %>
+
+    <div class="form-body">
+      <form action="<%= action %>" method="<%= method %>">
+        <%- include('../plantillas/csrf') %>
+        <div class="form-grid">
+          <label class="field">
+            <span>Kilos</span>
+            <input type="number" name="kilos" min="0" step="0.01"
+              value="<%= lote && lote.kilos !== undefined ? lote.kilos : '' %>"
+              placeholder="0.00" required>
+          </label>
+          <label class="field">
+            <span>Número de cajas</span>
+            <input type="number" name="numero_cajas" min="0" step="1"
+              value="<%= lote && lote.numero_cajas !== undefined ? lote.numero_cajas : '' %>"
+              placeholder="0" required>
+          </label>
+
+          <div class="field full">
+            <span>Especies del lote</span>
+            <div class="especies-lote" id="especies-lote">
+              <% filasFormulario.forEach((fila) => { %>
+              <%- include('_especie_fila', { fila, listaTipos, igual }) %>
+              <% }) %>
+            </div>
+            <div class="especies-acciones">
+              <button type="button" class="ghost-button" data-agregar-especie>
+                <i class="bi bi-plus-lg"></i>Agregar otra especie
+              </button>
+              <% if (!listaTipos.length) { %>
+              <small>No hay tipos. <a href="/tipos/crear">Registra uno primero</a>; si no, el lote se guarda sin especie.</small>
+              <% } else { %>
+              <small>Puedes combinar varias especies en el mismo lote, por ejemplo camarón y robalo.</small>
+              <% } %>
+            </div>
+          </div>
+
+          <label class="field">
+            <span>Precio de venta por kilo</span>
+            <input type="number" name="precio_kilo_salida" min="0" step="0.01"
+              value="<%= lote && lote.precio_kilo_salida !== undefined ? lote.precio_kilo_salida : '' %>"
+              placeholder="0.00" required>
+            <small>Es el precio que se muestra a los compradores.</small>
+          </label>
+          <label class="field">
+            <span>Fecha de entrada</span>
+            <input type="datetime-local" name="fecha"
+              value="<%= fechaValor(lote ? lote.fecha : null) %>" required>
+          </label>
+
+          <div class="field full">
+            <div class="form-note">
+              <i class="bi bi-info-circle"></i>
+              La venta estimada se calcula multiplicando los kilos por el precio de venta por kilo.
+            </div>
+          </div>
+        </div>
+
+        <template id="especie-plantilla">
+          <%- include('_especie_fila', { fila: {}, listaTipos, igual }) %>
+        </template>
+
+        <div class="form-actions">
+          <button class="primary-button" type="submit">
+            <i class="bi bi-check2"></i>Guardar
+          </button>
+          <a href="/lotes" class="ghost-button">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="/js/lotes.js" defer></script>
+<%- include('../plantillas/footer') %>

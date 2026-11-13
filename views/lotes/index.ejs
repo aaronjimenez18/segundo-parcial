@@ -1,0 +1,115 @@
+<%- include('../plantillas/header', { seccion: 'lotes', titulo: 'Mercancía' }) %>
+
+<%
+  const listaLotes = typeof lotes !== "undefined" && lotes ? lotes : [];
+  const fmt = (n) =>
+    Number(n || 0).toLocaleString("es-MX", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  const fecha = (d) =>
+    d
+      ? new Date(d).toLocaleDateString("es-MX", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        })
+      : "—";
+%>
+
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">Lo que llega</p>
+    <h1>Mercancía</h1>
+  </div>
+  <div class="heading-actions">
+    <a href="/lotes/crear" class="primary-button">
+      <i class="bi bi-plus-lg"></i>Nuevo lote
+    </a>
+  </div>
+</div>
+<div class="card">
+  <div class="toolbar">
+    <div>
+      <strong>Mercancía registrada</strong>
+      <p><%= listaLotes.length %> <%= listaLotes.length === 1 ? 'entrada en total' : 'entradas en total' %></p>
+    </div>
+  </div>
+
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Entrada</th>
+          <th>Producto</th>
+          <th>Kilos</th>
+          <th class="cell-center">Cajas</th>
+          <th>Precio venta</th>
+          <th>Venta estimada</th>
+          <th>Estado</th>
+          <th>Fecha de entrada</th>
+          <th class="cell-right">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (listaLotes.length) { %>
+          <% listaLotes.forEach((l) => { %>
+          <tr>
+            <td class="row-id">#<%= l.id_lte %></td>
+            <td>
+              <% const especiesLote = Array.isArray(l.especies) ? l.especies : []; %>
+              <% if (especiesLote.length) { %>
+              <div class="cell-name"><%= especiesLote.map((e) => e.nombre).join(' + ') %></div>
+              <div class="cell-meta">
+                <%= especiesLote.map((e) => e.tipo ? e.tipo.nombre : 'Sin tipo').join(' · ') %>
+              </div>
+              <% } else { %>
+              <span class="cell-muted">Sin especie</span>
+              <% } %>
+            </td>
+            <td class="cell-strong"><%= fmt(l.kilos) %> kg</td>
+            <td class="cell-center"><%= l.numero_cajas %></td>
+            <td>$<%= fmt(l.precio_kilo_salida) %></td>
+            <td>
+              <div class="cell-strong">$<%= fmt(Number(l.kilos) * Number(l.precio_kilo_salida)) %></div>
+              <div class="cell-meta"><%= fmt(l.kilos) %> kg × $<%= fmt(l.precio_kilo_salida) %>/kg</div>
+            </td>
+            <td>
+              <% const vendida = Boolean(l.compra); %>
+              <span class="status <%= vendida ? 'muted' : 'success' %>"><%= vendida ? 'Vendida' : 'Disponible' %></span>
+            </td>
+            <td class="cell-muted"><%= fecha(l.fecha) %></td>
+            <td>
+              <div class="row-actions">
+                <a class="icon-action" href="/lotes/<%= l.id_lte %>/editar" title="Editar">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <form action="/lotes/<%= l.id_lte %>?_method=DELETE" method="POST"
+                  data-confirm-title="Eliminar entrada"
+                  data-confirm="Se eliminará la entrada de mercancía #<%= l.id_lte %>. Esta acción no se puede deshacer.">
+        <%- include('../plantillas/csrf') %>
+                  <button class="icon-action danger" type="submit" title="Eliminar">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="9">
+              <div class="empty-state">
+                <i class="bi bi-box2"></i>
+                <p>Todavía no has registrado mercancía.</p>
+                <a href="/lotes/crear" class="primary-button">Registrar la primera entrada</a>
+              </div>
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('../plantillas/footer') %>

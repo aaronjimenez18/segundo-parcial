@@ -1,0 +1,48 @@
+<%- include('../plantillas/header', { seccion: 'tipos', titulo: tipo ? 'Editar tipo' : 'Nuevo tipo' }) %>
+
+<div class="form-wrap">
+  <a class="breadcrumb-back" href="/tipos">
+    <i class="bi bi-arrow-left"></i>Volver a tipos
+  </a>
+
+  <div class="card form-card">
+    <div class="card-head">
+      <div>
+        <p class="eyebrow">Lonja</p>
+        <h2><%= tipo ? 'Editar tipo' : 'Nuevo tipo' %></h2>
+        <p>Categoría con la que se clasifican las especies.</p>
+      </div>
+    </div>
+
+    <% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert-danger" role="alert">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <div><%= error %></div>
+    </div>
+    <% } %>
+
+    <div class="form-body">
+      <form action="<%= action %>" method="<%= method %>">
+        <%- include('../plantillas/csrf') %>
+        <div class="form-grid">
+          <label class="field full">
+            <span>Nombre del tipo</span>
+            <input type="text" name="nombre" maxlength="30"
+              value="<%= tipo && tipo.nombre ? tipo.nombre : '' %>"
+              placeholder="Pescado, marisco, molusco…" required>
+            <small>Se usa para agrupar las especies del catálogo.</small>
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button class="primary-button" type="submit">
+            <i class="bi bi-check2"></i>Guardar
+          </button>
+          <a href="/tipos" class="ghost-button">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<%- include('../plantillas/footer') %>

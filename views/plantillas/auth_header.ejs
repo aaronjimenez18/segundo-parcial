@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="csrf-token"
+      content="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>"
+    />
+    <title>Lonja de Veracruz</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/app.css" />
+  </head>
+  <body class="auth-body">
+    <div class="auth-shell">
+      <aside class="auth-aside">
+        <a class="auth-brand" href="/" aria-label="Lonja de Veracruz">
+          <span class="auth-brand-mark">L</span>
+          <span class="auth-brand-copy">
+            <strong>Lonja</strong>
+            <span>Veracruz</span>
+          </span>
+        </a>
+
+        <div class="auth-aside-body">
+          <h2>Sistema de Compras</h2>
+          <p>El reporte diario siempre a la mano.</p>
+        </div>
+      </aside>
+
+      <main class="auth-panel">
+        <div class="auth-card"></div>
+      </main>
+    </div>
+  </body>
+</html>

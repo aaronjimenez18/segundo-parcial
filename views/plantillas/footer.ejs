@@ -1,0 +1,41 @@
+    <%- '</main>' %>
+
+    <footer class="app-footer">
+      <span>Sistema de compras</span>
+      <span>Aaron Jimenez</span>
+    </footer>
+  </div>
+</div>
+
+<div class="confirm-modal" id="confirm-modal" hidden>
+  <div class="confirm-backdrop" data-confirm-cancel></div>
+  <div
+    class="confirm-card"
+    role="alertdialog"
+    aria-modal="true"
+    aria-labelledby="confirm-title"
+    aria-describedby="confirm-text"
+  >
+    <span class="confirm-icon"><i class="bi bi-exclamation-triangle"></i></span>
+    <h2 id="confirm-title">Eliminar registro</h2>
+    <p id="confirm-text">Esta acción no se puede deshacer.</p>
+    <label class="field confirm-code" id="confirm-code-wrap" hidden>
+      <span>Contraseña de administrador</span>
+      <input type="password" id="confirm-code" autocomplete="current-password"
+        placeholder="Escribe la contraseña de un administrador">
+    </label>
+    <div class="confirm-actions">
+      <button type="button" class="ghost-button" data-confirm-cancel>
+        Cancelar
+      </button>
+      <button type="button" class="danger-button" data-confirm-accept>
+        Sí, eliminar
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="/js/confirmar.js" defer></script>
+<script src="/js/app.js" defer></script>
+</body>
+</html>

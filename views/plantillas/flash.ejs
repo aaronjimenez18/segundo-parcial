@@ -1,0 +1,6 @@
+<% if (typeof flash !== "undefined" && flash && flash.mensaje) { %>
+<div class="alert-<%= flash.tipo === "error" ? "danger" : "success" %> flash" role="status">
+  <i class="bi bi-<%= flash.tipo === "error" ? "exclamation-triangle-fill" : "check2-circle" %>"></i>
+  <div><%= flash.mensaje %></div>
+</div>
+<% } %>

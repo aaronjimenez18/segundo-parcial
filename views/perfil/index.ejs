@@ -1,0 +1,52 @@
+<%- include('../plantillas/header', { seccion: 'perfil', titulo: 'Mi cuenta' }) %>
+
+<div class="form-wrap">
+  <div class="card form-card">
+    <div class="card-head">
+      <div>
+        <p class="eyebrow">Cuenta</p>
+        <h2>Mi cuenta</h2>
+        <p><%= usuario.nombre %> <%= usuario.apellido %> · <%= usuario.email %></p>
+      </div>
+    </div>
+
+    <% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert-danger" role="alert">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <div><%= error %></div>
+    </div>
+    <% } %>
+
+    <div class="form-body">
+      <form action="/perfil" method="POST">
+        <%- include('../plantillas/csrf') %>
+        <div class="form-grid">
+          <label class="field full">
+            <span>Contraseña actual</span>
+            <input type="password" name="actual" autocomplete="current-password" required>
+          </label>
+
+          <label class="field">
+            <span>Nueva contraseña</span>
+            <input type="password" name="nueva" autocomplete="new-password" minlength="8" required>
+            <small>Mínimo 8 caracteres, con al menos una letra y un número.</small>
+          </label>
+
+          <label class="field">
+            <span>Confirmar nueva contraseña</span>
+            <input type="password" name="confirmar" autocomplete="new-password" minlength="8" required>
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button class="primary-button" type="submit">
+            <i class="bi bi-shield-check"></i>Cambiar contraseña
+          </button>
+          <a href="<%= usuario.rol === 'admin' ? '/reportes/diario' : '/compras' %>" class="ghost-button">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<%- include('../plantillas/footer') %>

@@ -1,0 +1,134 @@
+<%- include('../plantillas/header', { seccion: 'compras', titulo: compra ? 'Editar compra' : (usuario && usuario.rol === 'admin' ? 'Registrar compra' : 'Comprar lote') }) %>
+
+<%
+  const listaLotes = typeof lotes !== "undefined" && lotes ? lotes : [];
+  const esAdmin = typeof usuario !== "undefined" && usuario && usuario.rol === "admin";
+  const listaCompradores =
+    typeof compradores !== "undefined" && compradores ? compradores : [];
+  const fechaValor = (d) => {
+    if (!d) return "";
+    const f = new Date(d);
+    if (isNaN(f.getTime())) return "";
+    const p = (n) => String(n).padStart(2, "0");
+    return `${f.getFullYear()}-${p(f.getMonth() + 1)}-${p(f.getDate())}T${p(f.getHours())}:${p(f.getMinutes())}`;
+  };
+  const igual = (a, b) => String(a) === String(b);
+  const productoDeLote = (l) => {
+    const especies = Array.isArray(l.especies) ? l.especies : [];
+    if (!especies.length) return "Sin especie";
+    return especies
+      .map((e) => `${e.nombre}${e.tipo ? ` (${e.tipo.nombre})` : ""}`)
+      .join(" + ");
+  };
+%>
+
+<div class="form-wrap">
+  <a class="breadcrumb-back" href="/compras">
+    <i class="bi bi-arrow-left"></i>Volver a compras
+  </a>
+
+  <div class="card form-card">
+    <div class="card-head">
+      <div>
+        <p class="eyebrow"><%= esAdmin ? 'Movimiento del día' : 'Nueva adquisición' %></p>
+        <h2><%= compra ? 'Editar compra' : (esAdmin ? 'Registrar compra' : 'Comprar un lote') %></h2>
+        <p><%= esAdmin ? 'Elige el lote completo y el comprador. El precio se toma del registro de mercancía.' : 'Elige el lote completo que quieres comprar. El precio se toma del registro de mercancía.' %></p>
+      </div>
+    </div>
+
+    <% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert-danger" role="alert">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <div><%= error %></div>
+    </div>
+    <% } %>
+
+    <div class="form-body">
+      <form action="<%= action %>" method="<%= method %>" id="form-compra">
+        <%- include('../plantillas/csrf') %>
+        <div class="form-grid">
+          <label class="field">
+            <span>Lote</span>
+            <select name="id_lte" id="select-lote" required>
+              <option value="">Elige el lote</option>
+              <% listaLotes.forEach((l) => { %>
+              <option value="<%= l.id_lte %>" data-kilos="<%= l.kilos %>" data-precio="<%= l.precio_kilo_salida %>" <%= compra && igual(compra.id_lte, l.id_lte) ? 'selected' : '' %>>
+                Entrada #<%= l.id_lte %> · <%= productoDeLote(l) %> · <%= l.kilos %> kg · <%= l.numero_cajas %> cajas · $<%= Number(l.precio_kilo_salida).toFixed(2) %>/kg
+              </option>
+              <% }) %>
+            </select>
+            <% if (!listaLotes.length) { %>
+            <small>No hay lotes disponibles. <a href="/lotes/crear">Registra una entrada primero</a>.</small>
+            <% } %>
+          </label>
+
+          <% if (esAdmin) { %>
+          <label class="field">
+            <span>Comprador</span>
+            <select name="codigo_cpr" required>
+              <option value="">Elige el comprador</option>
+              <% listaCompradores.forEach((c) => { %>
+              <option value="<%= c.codigo_cpr %>" <%= compra && igual(compra.codigo_cpr, c.codigo_cpr) ? 'selected' : '' %>>
+                #<%= c.codigo_cpr %> · <%= c.nombre %> <%= c.apellido_paterno %> <%= c.apellido_materno %>
+              </option>
+              <% }) %>
+            </select>
+            <% if (!listaCompradores.length) { %>
+            <small>No hay compradores registrados. El perfil se crea cuando un comprador inicia sesión y compra un lote.</small>
+            <% } %>
+          </label>
+          <% } else { %>
+          <div class="field">
+            <span>Comprador</span>
+            <div class="venta-resumen">
+              <div>
+                <span>A nombre de</span>
+                <strong><%= usuario.nombre %> <%= usuario.apellido %></strong>
+              </div>
+              <div>
+                <span>Correo</span>
+                <strong><%= usuario.email %></strong>
+              </div>
+            </div>
+          </div>
+          <% } %>
+
+          <div class="field full">
+            <div class="venta-resumen" id="resumen-venta">
+              <div>
+                <span>Kilos del lote</span>
+                <strong id="resumen-kilos">—</strong>
+              </div>
+              <div>
+                <span>Precio por kilo</span>
+                <strong id="resumen-precio">—</strong>
+              </div>
+              <div>
+                <span>Total a pagar</span>
+                <strong id="resumen-total">—</strong>
+              </div>
+            </div>
+            <small id="ayuda-total">Elige un lote para calcular el total automáticamente.</small>
+          </div>
+
+          <label class="field full">
+            <span>Fecha de la compra</span>
+            <input type="datetime-local" name="fecha"
+              value="<%= fechaValor(compra ? compra.fecha : new Date()) %>" required>
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button class="primary-button" type="submit">
+            <i class="bi bi-check2"></i><%= compra ? 'Guardar cambios' : (esAdmin ? 'Registrar compra' : 'Confirmar compra') %>
+          </button>
+          <a href="/compras" class="ghost-button">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="/js/compra-form.js" defer></script>
+
+<%- include('../plantillas/footer') %>

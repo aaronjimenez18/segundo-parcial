@@ -1,0 +1,46 @@
+<%
+  const haySesion = typeof usuario !== "undefined" && usuario;
+  const mensaje403 = typeof mensaje !== "undefined" && mensaje
+    ? mensaje
+    : "Tu cuenta no tiene permisos para entrar a esta sección.";
+%>
+<% if (haySesion) { %>
+<%- include('../plantillas/header', { seccion: '', titulo: 'Acceso denegado' }) %>
+<% } else { %>
+<%- include('../plantillas/auth_header') %>
+<% } %>
+
+<% if (haySesion) { %>
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">Seguridad</p>
+    <h1>Acceso denegado</h1>
+    <p class="subtitle"><%= mensaje403 %></p>
+  </div>
+</div>
+
+<div class="card">
+  <div class="empty-state">
+    <i class="bi bi-shield-lock"></i>
+    <p><%= mensaje403 %></p>
+    <a href="<%= usuario && usuario.rol === 'admin' ? '/reportes/diario' : '/compras' %>" class="primary-button">
+      <i class="bi bi-arrow-left"></i>Volver al inicio
+    </a>
+  </div>
+</div>
+<% } else { %>
+<div class="auth-head">
+  <div class="auth-logo"><i class="bi bi-shield-lock"></i></div>
+  <h1>Acceso denegado</h1>
+  <p><%= mensaje403 %></p>
+</div>
+<a class="primary-button" href="/login">
+  <i class="bi bi-arrow-left"></i>Volver al inicio
+</a>
+<% } %>
+
+<% if (haySesion) { %>
+<%- include('../plantillas/footer') %>
+<% } else { %>
+<%- include('../plantillas/auth_footer') %>
+<% } %>

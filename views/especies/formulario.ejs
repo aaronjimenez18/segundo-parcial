@@ -1,0 +1,90 @@
+<%- include('../plantillas/header', { seccion: 'especies', titulo: especie ? 'Editar especie' : 'Nueva especie' }) %>
+
+<%
+  const listaLotes = typeof lotes !== "undefined" && lotes ? lotes : [];
+  const listaTipos = typeof tipos !== "undefined" && tipos ? tipos : [];
+  const igual = (a, b) => String(a) === String(b);
+%>
+
+<div class="form-wrap">
+  <a class="breadcrumb-back" href="/especies">
+    <i class="bi bi-arrow-left"></i>Volver a especies
+  </a>
+
+  <div class="card form-card">
+    <div class="card-head">
+      <div>
+        <p class="eyebrow">Lonja</p>
+        <h2><%= especie ? 'Editar especie' : 'Nueva especie' %></h2>
+        <p>Asocia la especie con su lote y su tipo de producto.</p>
+      </div>
+    </div>
+
+    <% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert-danger" role="alert">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <div><%= error %></div>
+    </div>
+    <% } %>
+
+    <div class="form-body">
+      <form action="<%= action %>" method="<%= method %>">
+        <%- include('../plantillas/csrf') %>
+        <div class="form-grid">
+          <label class="field full">
+            <span>Nombre de la especie</span>
+            <input type="text" name="nombre" maxlength="25"
+              value="<%= especie && especie.nombre ? especie.nombre : '' %>"
+              placeholder="Camarón, pulpo, robalo…" required>
+          </label>
+
+          <label class="field">
+            <span>Lote</span>
+            <select name="id_lte" required>
+              <option value="">Selecciona un lote</option>
+              <% listaLotes.forEach((l) => { %>
+              <option value="<%= l.id_lte %>" <%= especie && igual(especie.id_lte, l.id_lte) ? 'selected' : '' %>>
+                Lote #<%= l.id_lte %> · <%= l.kilos %> kg
+              </option>
+              <% }) %>
+            </select>
+            <% if (!listaLotes.length) { %>
+            <small>No hay lotes. <a href="/lotes/crear">Registra uno primero</a>.</small>
+            <% } %>
+          </label>
+          <label class="field">
+            <span>Tipo</span>
+            <select name="id_tpo" required>
+              <option value="">Selecciona un tipo</option>
+              <% listaTipos.forEach((t) => { %>
+              <option value="<%= t.id_tpo %>" <%= especie && igual(especie.id_tpo, t.id_tpo) ? 'selected' : '' %>>
+                <%= t.nombre %>
+              </option>
+              <% }) %>
+            </select>
+            <% if (!listaTipos.length) { %>
+            <small>No hay tipos. <a href="/tipos/crear">Registra uno primero</a>.</small>
+            <% } %>
+          </label>
+
+          <label class="field full">
+            <span>Imagen</span>
+            <input type="text" name="imagen" maxlength="100"
+              value="<%= especie && especie.imagen ? especie.imagen : '' %>"
+              placeholder="camaron.jpg">
+            <small>Nombre o ruta del archivo de imagen. Puede quedar vacío.</small>
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button class="primary-button" type="submit">
+            <i class="bi bi-check2"></i>Guardar
+          </button>
+          <a href="/especies" class="ghost-button">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<%- include('../plantillas/footer') %>

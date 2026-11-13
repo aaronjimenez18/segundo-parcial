@@ -1,0 +1,128 @@
+<%- include('../plantillas/header', { seccion: 'compras', titulo: 'Compras' }) %>
+
+<%
+  const listaCompras = typeof compras !== "undefined" && compras ? compras : [];
+  const esAdmin = typeof usuario !== "undefined" && usuario && usuario.rol === "admin";
+  const fmt = (n) =>
+    Number(n || 0).toLocaleString("es-MX", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  const fecha = (d) =>
+    d
+      ? new Date(d).toLocaleDateString("es-MX", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        })
+      : "—";
+%>
+
+<div class="page-heading">
+  <div>
+    <p class="eyebrow"><%= esAdmin ? 'Movimiento del día' : 'Tus adquisiciones' %></p>
+    <h1><%= esAdmin ? 'Compras' : 'Mis compras' %></h1>
+    <p class="subtitle"><%= esAdmin ? 'Revisa todas las compras de lotes y registra las que hagan los compradores.' : 'Consulta tus compras y adquiere nuevos lotes disponibles.' %></p>
+  </div>
+</div>
+
+<div class="card">
+  <div class="toolbar">
+    <div>
+      <strong><%= esAdmin ? 'Todas las compras' : 'Mi historial de compras' %></strong>
+      <p><%= listaCompras.length %> <%= listaCompras.length === 1 ? 'compra en total' : 'compras en total' %></p>
+    </div>
+  </div>
+
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Compra</th>
+          <th>Lote</th>
+          <% if (esAdmin) { %>
+          <th>Comprador</th>
+          <% } %>
+          <th>Precio por kilo</th>
+          <th>Total pagado</th>
+          <th>Fecha</th>
+          <% if (esAdmin) { %>
+          <th class="cell-right">Acciones</th>
+          <% } %>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (listaCompras.length) { %>
+          <% listaCompras.forEach((c) => { %>
+          <tr>
+            <td class="row-id">#<%= c.id_cmp %></td>
+            <td>
+              <% if (c.lote) { %>
+              <% const especiesLote = Array.isArray(c.lote.especies) ? c.lote.especies : []; %>
+              <div class="cell-name">
+                <%= especiesLote.length ? especiesLote.map((e) => e.nombre).join(' + ') : `Entrada #${c.lote.id_lte}` %>
+              </div>
+              <div class="cell-meta">
+                <% if (especiesLote.length) { %>
+                <%= especiesLote.map((e) => e.tipo ? e.tipo.nombre : 'Sin tipo').join(' · ') %> ·
+                <% } %>
+                <%= fmt(c.lote.kilos) %> kg · <%= c.lote.numero_cajas %> cajas
+              </div>
+              <% } else { %>
+              <span class="cell-muted">Sin mercancía</span>
+              <% } %>
+            </td>
+            <% if (esAdmin) { %>
+            <td>
+              <% if (c.comprador) { %>
+              <div class="cell-main">
+                <span class="cell-avatar"><%= (c.comprador.nombre || '?').charAt(0).toUpperCase() %></span>
+                <div>
+                  <div class="cell-name"><%= c.comprador.nombre %> <%= c.comprador.apellido_paterno %></div>
+                  <div class="cell-meta"><%= c.comprador.correo %></div>
+                </div>
+              </div>
+              <% } else { %>
+              <span class="cell-muted">Sin comprador</span>
+              <% } %>
+            </td>
+            <% } %>
+            <td>$<%= fmt(c.precio_kilo_final) %></td>
+            <td class="cell-strong">$<%= fmt(c.precio_total) %></td>
+            <td class="cell-muted"><%= fecha(c.fecha) %></td>
+            <% if (esAdmin) { %>
+            <td>
+              <div class="row-actions">
+                <a class="icon-action" href="/compras/<%= c.id_cmp %>/editar" title="Editar">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <form action="/compras/<%= c.id_cmp %>?_method=DELETE" method="POST"
+                  data-confirm-title="Eliminar compra"
+                  data-confirm="Se eliminará la compra #<%= c.id_cmp %>. Esta acción no se puede deshacer.">
+                  <%- include('../plantillas/csrf') %>
+                  <button class="icon-action danger" type="submit" title="Eliminar">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+              </div>
+            </td>
+            <% } %>
+          </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="<%= esAdmin ? 7 : 5 %>">
+              <div class="empty-state">
+                <i class="bi bi-cart3"></i>
+                <p><%= esAdmin ? 'Todavía no hay compras registradas.' : 'Todavía no has comprado ningún lote.' %></p>
+                <a href="/compras/crear" class="primary-button"><%= esAdmin ? 'Registrar la primera compra' : 'Comprar un lote' %></a>
+              </div>
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('../plantillas/footer') %>

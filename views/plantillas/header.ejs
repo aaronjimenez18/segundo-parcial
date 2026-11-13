@@ -1,0 +1,135 @@
+<% const seccionActual = typeof seccion !== "undefined" && seccion ? seccion :
+""; const tituloActual = typeof titulo !== "undefined" && titulo ? titulo :
+"Panel"; const usuarioActual = typeof usuario !== "undefined" && usuario ?
+usuario : null; const nombreUsuario = usuarioActual ? usuarioActual.nombre ||
+usuarioActual.email || "Usuario" : "Sesión activa"; const esAdmin =
+usuarioActual && usuarioActual.rol === "admin"; const iniciales =
+usuarioActual && usuarioActual.nombre ?
+usuarioActual.nombre.trim().charAt(0).toUpperCase() : "LV"; %>
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="csrf-token"
+      content="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>"
+    />
+    <title><%= tituloActual %> · Lonja de Veracruz</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/app.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar">
+        <a class="brand" href="<%= esAdmin ? '/reportes/diario' : '/compras' %>" aria-label="Lonja de Veracruz">
+          <div class="brand-mark">L</div>
+          <div class="brand-copy">
+            <strong>Lonja</strong>
+            <span>Veracruz</span>
+          </div>
+        </a>
+
+        <div class="nav-scroll">
+          <nav class="nav" aria-label="Navegación principal">
+            <% if (esAdmin) { %>
+            <a
+              class="nav-button <%= seccionActual === 'reportes' ? 'active' : '' %>"
+              href="/reportes/diario"
+            >
+              <span class="nav-icon"><i class="bi bi-bar-chart"></i></span>
+              <span>Reporte del día</span>
+            </a>
+            <% } %>
+            
+            <% if (esAdmin) { %>
+            <a
+              class="nav-button <%= seccionActual === 'compradores' ? 'active' : '' %>"
+              href="/compradores"
+            >
+              <span class="nav-icon"><i class="bi bi-person-vcard"></i></span>
+              <span>Compradores</span>
+            </a>
+            <% } %>
+            <% if (esAdmin) { %>
+            <a
+              class="nav-button <%= seccionActual === 'lotes' ? 'active' : '' %>"
+              href="/lotes"
+            >
+              <span class="nav-icon"><i class="bi bi-box2"></i></span>
+              <span>Mercancía</span>
+            </a>
+            <% } %>
+          </nav>
+
+          <% if (esAdmin) { %>
+          <div class="nav-label nav-label-spaced">Catálogo</div>
+          <nav class="nav" aria-label="Catálogo de productos">
+            <a
+              class="nav-button <%= seccionActual === 'especies' ? 'active' : '' %>"
+              href="/especies"
+            >
+              <span class="nav-icon"><i class="bi bi-basket"></i></span>
+              <span>Especies</span>
+            </a>
+            <a
+              class="nav-button <%= seccionActual === 'tipos' ? 'active' : '' %>"
+              href="/tipos"
+            >
+              <span class="nav-icon"><i class="bi bi-tags"></i></span>
+              <span>Tipos</span>
+            </a>
+          </nav>
+
+          <% } %>
+        </div>
+
+        <div class="sidebar-spacer"></div>
+
+        <div class="user-row">
+          <span class="avatar"><%= iniciales %></span>
+          <div>
+            <strong><%= nombreUsuario %></strong>
+            <span><%= esAdmin ? 'Administrador' : 'Comprador' %></span>
+          </div>
+        </div>
+      </aside>
+
+      <div class="main">
+        <header class="topbar">
+          <div class="breadcrumb">
+            <a class="breadcrumb-link" href="<%= esAdmin ? '/reportes/diario' : '/compras' %>">Lonja de Veracruz</a>
+            <span>/</span>
+            <strong><%= tituloActual %></strong>
+          </div>
+          <div class="top-actions">
+            <div class="live-pill"><span class="dot"></span>Sistema activo</div>
+            <a
+              class="icon-button"
+              href="/perfil"
+              title="Mi cuenta"
+              aria-label="Mi cuenta"
+            >
+              <i class="bi bi-person-circle"></i>
+            </a>
+            <form action="/logout" method="POST" class="inline-form">
+              <%- include('csrf') %>
+              <button
+                type="submit"
+                class="icon-button"
+                title="Cerrar sesión"
+                aria-label="Cerrar sesión"
+              >
+                <i class="bi bi-box-arrow-right"></i>
+              </button>
+            </form>
+          </div>
+        </header>
+
+        <%- '<main class="content">' %> <%- include('flash') %>
+

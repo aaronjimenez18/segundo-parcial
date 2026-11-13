@@ -1,0 +1,200 @@
+<%- include('../plantillas/header', { seccion: 'reportes', titulo: 'Reporte del día' }) %>
+
+<%
+  const fechaReporte = typeof fecha !== "undefined" && fecha ? fecha : new Date().toISOString().slice(0, 10);
+  const listaCompras = typeof compras !== "undefined" && compras ? compras : [];
+  const listaResumen = typeof resumen !== "undefined" && resumen ? resumen : [];
+  const fmt = (n) =>
+    Number(n || 0).toLocaleString("es-MX", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  const hora = (d) =>
+    d
+      ? new Date(d).toLocaleTimeString("es-MX", {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : "—";
+  const totalDia = listaCompras.reduce(
+    (a, c) => a + Number(c.precio_total || 0),
+    0,
+  );
+  const kilosDia = listaCompras.reduce(
+    (a, c) => a + Number(c.lote ? c.lote.kilos : 0),
+    0,
+  );
+%>
+
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">Resumen del día</p>
+    <h1>Reporte del día</h1>
+    <p class="subtitle">Todo lo que se compró en la lonja en la fecha que elijas. Aquí puedes revisar quién compró, cuánto producto se llevó y cuánto pagó.</p>
+  </div>
+  <div class="heading-actions">
+    <span class="date-chip"><i class="bi bi-calendar3"></i> <%= fechaReporte %></span>
+    <button class="ghost-button" type="button" data-print>
+      <i class="bi bi-printer"></i>Imprimir
+    </button>
+  </div>
+</div>
+
+<div class="card" style="margin-bottom: 20px;">
+  <form class="report-filter" action="/reportes/diario" method="GET">
+    <label class="field">
+      <span>Elige la fecha</span>
+      <input type="date" name="fecha" value="<%= fechaReporte %>">
+    </label>
+    <button class="primary-button" type="submit">
+      <i class="bi bi-search"></i>Ver reporte
+    </button>
+    <div class="filter-group" style="margin-left: auto;">
+      <a class="filter-button active" href="/reportes/diario">
+        <i class="bi bi-cart3"></i> Compras
+      </a>
+    </div>
+  </form>
+</div>
+
+<div class="card" style="margin-bottom: 20px;">
+  <div class="toolbar">
+    <div>
+      <strong>Resumen por comprador</strong>
+      <p><%= listaResumen.length %> <%= listaResumen.length === 1 ? 'comprador compró' : 'compradores compraron' %> en esta fecha</p>
+    </div>
+  </div>
+
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Comprador</th>
+          <th class="cell-center">Compras</th>
+          <th class="cell-right">Kilos</th>
+          <th class="cell-right">Total pagado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (listaResumen.length) { %>
+          <% listaResumen.forEach((r) => { %>
+          <tr>
+            <td>
+              <div class="cell-main">
+                <span class="cell-avatar"><%= (r.nombre || '?').charAt(0).toUpperCase() %></span>
+                <div>
+                  <div class="cell-name"><%= r.nombre %></div>
+                  <div class="cell-meta">Comprador #<%= r.codigo %></div>
+                </div>
+              </div>
+            </td>
+            <td class="cell-center"><%= r.compras %></td>
+            <td class="cell-right"><%= fmt(r.kilos) %> kg</td>
+            <td class="cell-right cell-strong">$<%= fmt(r.total) %></td>
+          </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="4">
+              <div class="empty-state">
+                <i class="bi bi-inbox"></i>
+                <p>Ese día no hubo compras de compradores.</p>
+              </div>
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+      <% if (listaResumen.length) { %>
+      <tfoot class="report-total">
+        <tr>
+          <td>Total del día</td>
+          <td class="cell-center"><%= listaCompras.length %></td>
+          <td class="cell-right"><%= fmt(kilosDia) %> kg</td>
+          <td class="cell-right">$<%= fmt(totalDia) %></td>
+        </tr>
+      </tfoot>
+      <% } %>
+    </table>
+  </div>
+</div>
+
+<div class="card">
+  <div class="toolbar">
+    <div>
+      <strong>Compras una por una</strong>
+      <p>Cada fila es una compra registrada ese día.</p>
+    </div>
+  </div>
+
+  <div class="table-scroll">
+    <table class="data-table report-table">
+      <thead>
+        <tr>
+          <th>Compra</th>
+          <th>Hora</th>
+          <th>Mercancía</th>
+          <th>Comprador</th>
+          <th class="cell-right">Precio venta</th>
+          <th class="cell-right">Kilos</th>
+          <th class="cell-right">Total pagado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (listaCompras.length) { %>
+          <% listaCompras.forEach((c) => { %>
+          <tr>
+            <td class="row-id">#<%= c.id_cmp %></td>
+            <td class="cell-muted"><%= hora(c.fecha) %></td>
+            <td>
+              <% if (c.lote) { %>
+              <% const especiesLote = Array.isArray(c.lote.especies) ? c.lote.especies : []; %>
+              <div class="cell-name">
+                <%= especiesLote.length ? especiesLote.map((e) => e.nombre).join(' + ') : `Entrada #${c.lote.id_lte}` %>
+              </div>
+              <div class="cell-meta">
+                <% if (especiesLote.length) { %>
+                <%= especiesLote.map((e) => e.tipo ? e.tipo.nombre : 'Sin tipo').join(' · ') %> ·
+                <% } %>
+                Entrada #<%= c.lote.id_lte %>
+              </div>
+              <% } else { %>
+              <span class="cell-muted">—</span>
+              <% } %>
+            </td>
+            <td>
+              <% if (c.comprador) { %>
+              <div class="cell-name"><%= c.comprador.nombre %> <%= c.comprador.apellido_paterno %></div>
+              <% } else { %>
+              <span class="cell-muted">—</span>
+              <% } %>
+            </td>
+            <td class="cell-right">$<%= fmt(c.precio_kilo_final) %></td>
+            <td class="cell-right"><%= fmt(c.lote ? c.lote.kilos : 0) %> kg</td>
+            <td class="cell-right cell-strong">$<%= fmt(c.precio_total) %></td>
+          </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="7">
+              <div class="empty-state">
+                <i class="bi bi-inbox"></i>
+                <p>Ese día no se registró ninguna compra.</p>
+              </div>
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+      <% if (listaCompras.length) { %>
+      <tfoot class="report-total">
+        <tr>
+          <td colspan="7">Total del día</td>
+          <td class="cell-right"><%= fmt(kilosDia) %> kg</td>
+          <td class="cell-right">$<%= fmt(totalDia) %></td>
+        </tr>
+      </tfoot>
+      <% } %>
+    </table>
+  </div>
+</div>
+
+<%- include('../plantillas/footer') %>

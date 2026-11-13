@@ -1,0 +1,106 @@
+<%- include('../plantillas/header', { seccion: 'especies', titulo: 'Especies' }) %>
+
+<%
+  const listaEspecies =
+    typeof especies !== "undefined" && especies ? especies : [];
+%>
+
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">Lonja</p>
+    <h1>Especies</h1>
+  </div>
+  <div class="heading-actions">
+    <a href="/especies/crear" class="primary-button">
+      <i class="bi bi-plus-lg"></i>Nueva especie
+    </a>
+  </div>
+</div>
+
+<div class="card">
+  <div class="toolbar">
+    <div>
+      <strong>Catálogo de especies</strong>
+      <p><%= listaEspecies.length %> <%= listaEspecies.length === 1 ? 'especie registrada' : 'especies registradas' %></p>
+    </div>
+    <a href="/especies/crear" class="ghost-button">
+      <i class="bi bi-plus-lg"></i>Agregar
+    </a>
+  </div>
+
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Especie</th>
+          <th>Lote</th>
+          <th>Tipo</th>
+          <th>Imagen</th>
+          <th class="cell-right">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (listaEspecies.length) { %>
+          <% listaEspecies.forEach((e) => { %>
+          <tr>
+            <td class="row-id">#<%= e.id_epe %></td>
+            <td>
+              <div class="cell-main">
+                <span class="cell-avatar"><%= (e.nombre || '?').charAt(0).toUpperCase() %></span>
+                <div>
+                  <div class="cell-name"><%= e.nombre %></div>
+                  <div class="cell-meta">Especie #<%= e.id_epe %></div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <% if (e.lote) { %>
+              <div class="cell-name">Lote #<%= e.lote.id_lte %></div>
+              <div class="cell-meta"><%= e.lote.kilos %> kg</div>
+              <% } else { %>
+              <span class="cell-muted">Sin lote</span>
+              <% } %>
+            </td>
+            <td>
+              <% if (e.tipo) { %>
+              <span class="status info"><%= e.tipo.nombre %></span>
+              <% } else { %>
+              <span class="cell-muted">Sin tipo</span>
+              <% } %>
+            </td>
+            <td class="cell-muted"><%= e.imagen ? e.imagen : '—' %></td>
+            <td>
+              <div class="row-actions">
+                <a class="icon-action" href="/especies/<%= e.id_epe %>/editar" title="Editar">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <form action="/especies/<%= e.id_epe %>?_method=DELETE" method="POST"
+                  data-confirm-title="Eliminar especie"
+                  data-confirm="Se eliminará la especie <%= capitalizar(e.nombre) %>. Esta acción no se puede deshacer.">
+        <%- include('../plantillas/csrf') %>
+                  <button class="icon-action danger" type="submit" title="Eliminar">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="6">
+              <div class="empty-state">
+                <i class="bi bi-basket"></i>
+                <p>Todavía no hay especies registradas.</p>
+                <a href="/especies/crear" class="primary-button">Registrar la primera</a>
+              </div>
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('../plantillas/footer') %>

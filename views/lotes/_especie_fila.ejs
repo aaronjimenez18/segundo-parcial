@@ -1,0 +1,28 @@
+<%
+  const datosFila = typeof fila !== "undefined" && fila ? fila : {};
+  const tiposDisponibles = Array.isArray(listaTipos) ? listaTipos : [];
+  const comparar = typeof igual === "function" ? igual : (a, b) => String(a) === String(b);
+  const valor = (v) => (v === undefined || v === null ? "" : v);
+%>
+<div class="especie-row">
+  <input type="hidden" name="id_epe[]" value="<%= valor(datosFila.id_epe) %>">
+  <label class="field">
+    <span>Tipo</span>
+    <select name="id_tpo[]" <%= tiposDisponibles.length ? "required" : "" %>>
+      <option value="">Selecciona un tipo</option>
+      <% tiposDisponibles.forEach((t) => { %>
+      <option value="<%= t.id_tpo %>" <%= comparar(datosFila.id_tpo, t.id_tpo) ? "selected" : "" %>><%= t.nombre %></option>
+      <% }) %>
+    </select>
+  </label>
+  <label class="field">
+    <span>Especie</span>
+    <input type="text" name="nombre_especie[]" maxlength="25"
+      value="<%= valor(datosFila.nombre) %>" placeholder="Camarón, robalo, pulpo…"
+      <%= tiposDisponibles.length ? "required" : "" %>>
+  </label>
+  <button type="button" class="icon-action danger" data-quitar-especie
+    title="Quitar especie" aria-label="Quitar especie">
+    <i class="bi bi-x-lg"></i>
+  </button>
+</div>

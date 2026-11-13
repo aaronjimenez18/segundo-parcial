@@ -1,0 +1,45 @@
+<%- include('../plantillas/auth_header') %>
+
+<div class="auth-head">
+  <div class="auth-logo"><i class="bi bi-box-arrow-in-right"></i></div>
+  <h1>Iniciar sesión</h1>
+  <p>Ingresa con tu cuenta de comprador o administrador.</p>
+</div>
+
+<% if (typeof error !== 'undefined' && error) { %>
+<div class="alert-danger" role="alert">
+  <i class="bi bi-exclamation-triangle-fill"></i>
+  <div><%= error %></div>
+</div>
+<% } %>
+
+<% if (typeof mensaje !== 'undefined' && mensaje) { %>
+<div class="alert-success" role="status">
+  <i class="bi bi-check2-circle"></i>
+  <div><%= mensaje %></div>
+</div>
+<% } %>
+
+<form action="<%= action %>" method="<%= method %>">
+  <%- include('../plantillas/csrf') %>
+  <label class="field">
+    <span>Correo electrónico</span>
+    <input type="email" name="usuario" placeholder="correo@ejemplo.com" autocomplete="username" required autofocus>
+  </label>
+
+  <label class="field">
+    <span>Contraseña</span>
+    <input type="password" name="password" placeholder="••••••••" autocomplete="current-password" required>
+  </label>
+
+  <button class="primary-button" type="submit">
+    <i class="bi bi-box-arrow-in-right"></i>Iniciar sesión
+  </button>
+</form>
+
+<div class="auth-links">
+  <span><i class="bi bi-shield-lock"></i> Acceso para compradores y administradores</span>
+  <span>FES Aragón</span>
+</div>
+
+<%- include('../plantillas/auth_footer') %>
